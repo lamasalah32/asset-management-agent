@@ -1,15 +1,17 @@
 # AI Asset Management Agent
 
-An intelligent asset management system that combines traditional CRUD operations with AI-powered natural language querying. Users can manage their assets through a REST API and interact with their data using conversational queries.
+An intelligent asset management system that combines traditional CRUD operations with AI-powered natural language querying. Users can manage assets through a REST API and interact with their data using conversational queries.
 
 ## Features
 
 - **CRUD Operations**: Full create, read, update, and delete functionality for assets
 - **AI Agent**: Natural language interface to query and analyze your assets
+- **Short-Term Memory**: The AI agent remembers recent queries within a session for more accurate, context-aware responses.
 - **RESTful API**: Built with FastAPI for high performance and automatic documentation
 - **LangChain Integration**: Leverages LangChain for intelligent agent behavior
 - **SQLite Database**: Lightweight, file-based storage for easy deployment
 - **Docker Support**: One-command deployment with automated build script
+
 
 
 ## Quick Start
@@ -104,6 +106,28 @@ curl -X POST "http://localhost:8000/agent/query" \
 }
 ```
 
+### Short-Term Memory Example
+
+The agent can maintain context within a session.
+
+Query assets by category
+
+```bash
+curl -X POST "http://localhost:8000/agent/query" \
+  -H "Content-Type: application/json" \
+  -d '{"question": "List all my electronics"}'
+```
+
+Follow-up query using context
+
+```bash
+curl -X POST "http://localhost:8000/agent/query" \
+  -H "Content-Type: application/json" \
+  -d '{"question": "Which of these is the most valuable?"}'
+```
+
+The agent remembers the previous list and returns an accurate answer, including the asset IDs as sources.
+
 ### Example Questions for AI Agent
 
 - "What is my most valuable asset?"
@@ -132,26 +156,4 @@ def get_llm():
         max_retries=2,
     )
 ```
-
-
-### Adding New Tools
-
-To extend the AI agent's capabilities, add new tools in `tools.py`:
-
-```python
-@tool
-def your_new_tool(param: str) -> str:
-    """
-    Description of what your tool does.
-    """
-    # Implementation
-    return result
-```
-
-Then register it in `main.py`:
-
-```python
-tools = [query_assets, your_new_tool]
-```
-
 

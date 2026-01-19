@@ -15,7 +15,7 @@ def query_assets(query: str) -> str:
 
     summary = []
     for a in assets:
-        summary.append(f"{a.name} (${a.value})")
+        summary.append(f"{a.name} (${a.value}) - Category: ({a.category}) - Purchased: {a.purchase_date} - Status: {a.status}")
 
     return "Assets: " + ", ".join(summary)
 

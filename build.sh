@@ -144,7 +144,7 @@ show_status() {
     echo "API documentation: http://localhost:$PORT/docs"
     echo ""
     echo "Useful commands:"
-    echo "  View logs:    docker logs -f $CONTAINER_NAME"
+    echo "  View logs:    docker logs $CONTAINER_NAME"
     echo "  Stop app:     docker stop $CONTAINER_NAME"
     echo "  Start app:    docker start $CONTAINER_NAME"
     echo "  Remove app:   docker rm -f $CONTAINER_NAME"
