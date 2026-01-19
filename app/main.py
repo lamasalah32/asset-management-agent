@@ -5,8 +5,10 @@ from langchain_core.messages import HumanMessage
 from llm import get_llm
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.agents import create_agent
+from langgraph.checkpoint.memory import InMemorySaver  
+from langgraph.checkpoint.sqlite import SqliteSaver
 
-from database import SessionLocal, engine, get_db
+from database import SessionLocal, engine, checkpointer
 from tools import query_assets
 import models, schemas, crud
 from system_prompt import SYSTEM_PROMPT
@@ -14,6 +16,22 @@ from system_prompt import SYSTEM_PROMPT
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI(title="AI Asset Management API")
+
+model = get_llm()
+tools = [query_assets]
+agent = create_agent(
+    model,
+    tools,
+    system_prompt=SYSTEM_PROMPT,
+    checkpointer=checkpointer,
+)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 @app.post("/assets", response_model=schemas.AssetOut)
 def create_asset(asset: schemas.AssetCreate, db: Session = Depends(get_db)):
@@ -45,15 +63,7 @@ def delete_asset(asset_id: int, db: Session = Depends(get_db)):
     return {"message": "Asset deleted"}
 
 @app.post("/agent/query", response_model=schemas.AgentResponse)
-def query_agent(req: schemas.AgentRequest):
-    model = get_llm()
-    tools = [query_assets]
-    agent = create_agent(
-        model,
-        tools,
-        system_prompt=SYSTEM_PROMPT,
-    )
-
+def query_agent(req: schemas.AgentRequest): 
     answer = agent.invoke(
         {
             "messages": [
@@ -66,6 +76,5 @@ def query_agent(req: schemas.AgentRequest):
 
     return schemas.AgentResponse(
         answer=final_answer or "No answer generated",
-        sources=[],
     )
 

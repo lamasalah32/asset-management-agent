@@ -5,4 +5,5 @@ pydantic
 langchain
 langchain-community
 langchain-ollama
+langgraph.checkpoint.sqlite
 
